@@ -1,22 +1,22 @@
 const { nextISSTimesForMyLocation } = require('./iss');
 
-const printPassTimes = (locationISS) => {
-  for (let pass in locationISS) {
+const printPassTimes = (passTimes) => {
+  for (let pass in passTimes) {
     const date = new Date(0);
-    date.setUTCSeconds(locationISS[pass].risetime);
-    const duration = locationISS[pass].duration;
+    date.setUTCSeconds(passTimes[pass].risetime);
+    const duration = passTimes[pass].duration;
     console.log(`Next pass at ${date} for ${duration} seconds!`);
   }
 };
 
-nextISSTimesForMyLocation((error, locationISS) => {
+nextISSTimesForMyLocation((error, passTimes) => {
   if (error) {
     return console.log('Nope, nevermind');
   }
-  printPassTimes(locationISS);
+  printPassTimes(passTimes);
 });
 
-
+module.exports = { printPassTimes }
 
 // Future reference, before the mass deletion
 // fetchMyIP((error, ip) => {
