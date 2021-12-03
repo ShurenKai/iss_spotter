@@ -33,20 +33,48 @@ const fetchCoordsByIP = function(ip, callback) {
 
 const fetchISSFlyOverTimes = function(location, callback) {
   request('https://iss-pass.herokuapp.com/json/?lat=' + location.latitude + '&lon=' + location.longitude, (error, response, body) => {
-    if (error){
-      callback(error, null)
-      return
+    if (error) {
+      callback(error, null);
+      return;
     }
     if (response.statusCode !== 200) {
       callback(Error(`${response.statusCode} is not valid, ${body}`), null);
       return;
     }
     const data = JSON.parse(body);
-    const locationISS = data.response
+    const locationISS = data.response;
     callback(null, locationISS);
-  })
-}
+  });
+};
+
+const nextISSTimesForMyLocation = function(callback) {
+  fetchMyIP((error, ip) => {
+    if (error) {
+      console.log("It didn't work!" , error);
+      return;
+    }
+    fetchCoordsByIP(ip, (error, location) => {
+      if (error) {
+        console.log('Cannot find coordinates at', ip);
+        return;
+      }
+      fetchISSFlyOverTimes(location, (error, locationISS) => {
+        if (error) {
+          console.log('You are not found at', location);
+          return;
+        }
+        callback(null, locationISS);
+      });
+    });
+  });
+};
 
 // future reference: module.exports will overwrite one another
-module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
+module.exports = { nextISSTimesForMyLocation };
+
+//Memories of failure
+// let rising = locationISS[0].risetime
+// let date = new Date(0)
+// let riseTimes = 'Next pass at ' + date.setUTCSeconds(rising) + ' for ' + locationISS[0].duration + ' seconds!'
+// callback(null, riseTimes)
 
